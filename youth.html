@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>LC Youth — Liberty Church</title>
+  <!-- "Train up a child in the way he should go; even when he is old he will not depart from it." - Proverbs 22:6 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/live-indicator.css">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <!-- Holy Spirit, move powerfully in the lives of our youth! -->
+  
+  <!-- Super Cool Animated Ticker Styles -->
+  <style>
+    .youth-ticker {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+      background-size: 200% 100%;
+      animation: gradientShift 8s ease infinite;
+      padding: 1.2rem 0;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .youth-ticker::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    .youth-ticker::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      animation: shimmer 2s ease-in-out infinite reverse;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { transform: translateX(-100%); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(100%); }
+    }
+    
+    .ticker-track {
+      display: flex;
+      animation: tickerScroll 25s linear infinite;
+      will-change: transform;
+    }
+    
+    .ticker-track:hover {
+      animation-play-state: paused;
+    }
+    
+    @keyframes tickerScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .ticker-item {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 0 4rem;
+      display: flex;
+      align-items: center;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.5px;
+      animation: textGlow 3s ease-in-out infinite;
+    }
+    
+    .ticker-item::before {
+      content: '⚡';
+      margin-right: 1rem;
+      font-size: 1.3rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .ticker-item::after {
+      content: '⚡';
+      margin-left: 1rem;
+      font-size: 1.3rem;
+      animation: pulse 1.5s ease-in-out infinite 0.75s;
+    }
+    
+    @keyframes textGlow {
+      0%, 100% { 
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.2); 
+      }
+      50% { 
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.4); 
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+      .ticker-item {
+        font-size: 0.95rem;
+        padding: 0 2rem;
+      }
+    }
+  </style>
+</head>
+<body class="youth" data-api-base="/api">
+<header class="header site-header">
+  <div class="container nav">
+  <a class="brand" href="https://www.golibertychurch.com/index.html">
+      <img src="assets/LC_YOUTH_LOGO.png" alt="LC Youth logo">
+      <span class="brand-title">
+        <span class="brand-plain">Liberty Church</span>
+        <span class="youth-mark">YOUTH</span>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="mainNav"><span class="hamburger" aria-hidden="true"></span><span class="sr-only">Open navigation</span></button>
+    <nav id="mainNav">
+      <ul>
+  <li><a href="https://www.golibertychurch.com/live.html">Watch Live</a></li>
+  <li><a href="https://www.golibertychurch.com/index.html">Home</a></li>
+  <li><a class="active" href="https://www.golibertychurch.com/youth.html">LC Youth</a></li>
+  <li><a href="https://www.golibertychurch.com/beliefs.html">Beliefs</a></li>
+  <li><a href="https://www.golibertychurch.com/sermons.html">Sermons</a></li>
+  <li><a href="https://www.golibertychurch.com/prayer.html">Prayer</a></li>
+  <li><a href="https://www.golibertychurch.com/give.html">Give</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+  <section class="hero youth-hero">
+    <video id="heroVideo" autoplay muted loop playsinline preload="metadata" poster="assets/youth-backdrop.png">
+      <source src="assets/LC_YOUTH_HERO_VID.mp4" type="video/mp4"/>
+    </video>
+    <div class="overlay"></div>
+    <div class="content container">
+      <span class="hero-subtitle">WE ARE LC YOUTH</span>
+      <h1 class="hero-title">LC Youth</h1>
+      <p class="hero-tagline">Rooted in Jesus. Fueled by community.</p>
+      <p class="hero-description">Middle and high school students discovering identity, purpose, and friendships that last forever.</p>
+    </div>
+  </section>
+
+  <!-- YouthUpdate Ticker: Youth ticker text to be updated from backend -->
+  <section class="youth-ticker" aria-live="polite">
+    <div class="ticker-track">
+      <div class="ticker-item">Sundays @ 9:20 AM — Youth Devotion | Pop-Up Events — Check back for more info</div>
+      <div class="ticker-item" aria-hidden="true">Sundays @ 9:20 AM — Youth Devotion | Pop-Up Events — Check back for more info</div>
+    </div>
+  </section>
+
+  <section class="section alt youth-scripture" id="week-in-word">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Here's what's speaking to us</span>
+        <h2>Scripture of the Week + Devotional</h2>
+        <p class="sub">Each week we rally around a verse and a short devo crafted by our youth team.</p>
+      </div>
+      <div class="youth-scripture-grid">
+        <article class="glass-card scripture-card" data-state="loading">
+          <span class="badge badge-light">Scripture of the Week</span>
+          <blockquote>
+            <p id="scripture-text">Loading a fresh word...</p>
+          </blockquote>
+          <cite id="scripture-reference"></cite>
+        </article>
+        <article class="glass-card devotional-card">
+          <div class="devotional-header">
+            <span class="badge badge-outline">Weekly Devo</span>
+            <h3>Lean in & reflect</h3>
+          </div>
+          <div id="devotional-text" class="devotional-text">
+            <p>Hang tight—our next devotional drops right after service!</p>
+          </div>
+          <div class="devotional-footer">
+            <p>Want to talk it out? Show up Sundays at <strong>9:20 AM</strong> for student-led conversation and prayer.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- YouthUpdate 2: Youth Announcements to be updated from backend -->
+  <section class="section alt youth-announcements" id="announcements">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Don't miss out</span>
+        <h2>Announcements & Events</h2>
+        <p class="sub">Fresh updates, pop-up hangs, and everything happening next.</p>
+      </div>
+      <div class="announcements-grid" id="announcements-grid">
+        <article class="announcement-card empty" id="announcements-empty">
+          <p class="muted">Announcements are loading...</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- YouthUpdate 3: Photo Gallery to be updated from backend -->
+
+    <section class="section youth-gallery" id="gallery">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Memories in motion</span>
+                <h2>Check out our past hangouts</h2>
+                <p class="sub">Choose an album to explore highlight photos and videos.</p>
+            </div>
+            <div class="gallery-controls">
+                <label class="sr-only" for="youth-album-select">Choose an album</label>
+                <select id="youth-album-select" class="album-select" disabled>
+                    <option value="">Albums coming soon</option>
+                </select>
+            </div>
+            <div class="gallery-stage empty" id="gallery-stage">
+                <div class="stage-placeholder">
+                    <p class="muted">Gallery coming soon. Check back after our next youth hangout!</p>
+                </div>
+            </div>
+            <div class="media-grid" id="gallery-media-grid" aria-live="polite"></div>
+        </div>
+    </section>
+    <script type="application/json" id="youthGalleryData">[]</script>
+
+  <!-- YouthUpdate 4: Videos from Past Events to be updated from backend -->
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Youth Times</h4>
+       <p>Sundays @ 9:20 AM - Youth Devotion<br/>
+         Pop-Up Events - Check back for schedule</p>
+        </div>
+        <div class="footer-section">
+          <h4>Location</h4>
+          <p>100 McKeithen Dr<br/>
+             Alexandria, LA 71303</p>
+        </div>
+        <div class="footer-section">
+          <h4>Connect</h4>
+          <div class="social-links">
+            <a href="https://www.youtube.com/@GoLibertyChurch" target="_blank" rel="noopener">YouTube</a>
+            <a href="https://www.facebook.com/GoLibertyChurch" target="_blank" rel="noopener">Facebook</a>
+            <a href="https://www.instagram.com/golibertychurch/" target="_blank" rel="noopener">Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Liberty Church. All rights reserved.</p>
+        <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Made with love by <a href="https://www.xrkr80hd.studio" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">xrkr80hd designs</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/site.js"></script>
+  <script type="module" src="assets/js/youth.js"></script>
+  <script src="assets/js/live-indicator.js"></script>
+</body>
+</html>

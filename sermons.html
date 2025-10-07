@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="e  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/live-indicator.css">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />>
+<!-- 
+	"Faith comes by hearing, and hearing by the word of God." - Romans 10:17
+	
+	Lord, let Your Word go forth with power through th			wrap.addEventListener('click', (e)=>{
+				const card = e.target.closest('article.card'); if(!card) return;
+				const id = card.getAttribute('data-id'); 
+				if(id) {
+					const video = data.recent.find(v => v.id === id);
+					play(id, video?.title, video?.description);
+				}
+			});sermons.
+	Touch every heart that hears, bring revelation and transformation.
+	Use this archive to feed Your sheep and reach the lost. Amen.
+-->
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<title>Sermons — Liberty Church</title>
+	<meta name="description" content="Watch recent sermons from Liberty Church." />
+	<!-- "My word that goes out from my mouth will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it." - Isaiah 55:11 -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./assets/style.css" />
+	<link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+	<!-- Holy Spirit, anoint these digital messages to change lives -->
+</head>
+<body>
+	<header class="header">
+		<div class="container nav">
+			<a class="brand" href="https://www.golibertychurch.com/index.html"><img src="assets/logo.png" alt="Liberty Church logo"><span class="name">Liberty Church</span></a>
+			<button class="nav-toggle" aria-expanded="false" aria-controls="mainNav"><span class="hamburger" aria-hidden="true"></span><span class="sr-only">Open navigation</span></button>
+			<nav id="mainNav">
+                <ul>
+					<li><a href="https://www.golibertychurch.com/live.html">Watch Live</a></li>
+					<li><a href="https://www.golibertychurch.com/index.html">Home</a></li>
+					<li><a href="https://www.golibertychurch.com/youth.html">LC Youth</a></li>
+					<li><a href="https://www.golibertychurch.com/beliefs.html">Beliefs</a></li>
+					<li><a class="active" href="https://www.golibertychurch.com/sermons.html">Sermons</a></li>
+					<li><a href="https://www.golibertychurch.com/prayer.html">Prayer</a></li>
+					<li><a href="https://www.golibertychurch.com/give.html">Give</a></li>
+                </ul>
+            </nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="section">
+			<div class="container">
+				<div class="section-head">
+					<h1>Messages</h1>
+					<p class="muted">Watch recent uploads, browse series, or view archived sermons. Tap any card to play below.</p>
+				</div>
+				<div class="embed aspect-16x9" id="sermonPlayer"></div>
+			</div>
+		</section>
+
+		<section class="section alt">
+			<div class="container">
+				<h2>Recently Uploaded</h2>
+				<div class="cards" id="recentGrid"></div>
+				<div class="btn-group mt-16" id="recentControls" hidden>
+					<button id="btnMoreRecent" class="btn small">Load more</button>
+					<button id="btnCollapseRecent" class="btn ghost small" hidden>Collapse</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<h2>Series</h2>
+				<div id="seriesList"></div>
+			</div>
+		</section>
+
+		<section class="section alt">
+			<div class="container">
+				<h2>Archived Sermons</h2>
+				<p class="muted">Older messages curated by our team.</p>
+				<div class="card">
+					<button id="toggleArchived" class="btn ghost" aria-expanded="false" aria-controls="archivedList">Show archived</button>
+					<div id="archivedList" class="mt-12" hidden>
+						<ul class="list" id="archivedUl"></ul>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container footer-grid">
+			<div>
+				<div class="brand brand-footer"><img class="footer-logo" src="assets/logo.png" alt="Liberty Church logo" /> <span class="brand-text">Liberty Church</span></div>
+				<p class="muted">© <span id="year"></span> Liberty Church. All rights reserved.</p>
+				<p class="muted" style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Made with love by <a href="https://www.xrkr80hd.studio" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">xrkr80hd designs</a></p>
+			</div>
+			<div>
+				<h4>Visit</h4>
+				<address id="footerAddress">100 McKeithen Dr, Alexandria, LA 71303</address>
+			</div>
+			<div>
+				<h4>Connect</h4>
+				<div class="social-footer">
+					<a id="youtubeLink" class="icon-btn" href="https://www.youtube.com/@GoLibertyChurch" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2s-.2-1.7-.8-2.4c-.7-.9-1.5-.9-1.9-1C17.9 2.4 12 2.4 12 2.4h0s-5.9 0-8.8.4c-.4.1-1.2.1-1.9 1-.6.7-.8 2.4-.8 2.4S0 8.2 0 10.1v1.7c0 1.9.2 3.9.2 3.9s.2 1.7.8 2.4c.7.9 1.6.9 2 1 1.5.1 6.6.4 8.6.4h1.6c2-.1 7.1-.3 8.6-.4.4-.1 1.2-.1 1.9-1 .6-.7.8-2.4.8-2.4s.2-1.9.2-3.9v-1.7c0-1.9-.2-3.9-.2-3.9ZM9.6 13.9V7.8l6.2 3-6.2 3.1Z"/></svg></a>
+					<a id="facebookLink" class="icon-btn" href="https://www.facebook.com/GoLibertyChurch" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.406.593 24 1.325 24H12.82v-9.294H9.692V11.08h3.127V8.414c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.463.098 2.795.142v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.764v2.313h3.588l-.467 3.625h-3.12V24h6.116C23.406 24 24 23.406 24 22.674V1.326C24 .593 23.406 0 22.675 0Z"/></svg></a>
+					<a id="instagramLink" class="icon-btn" href="https://www.instagram.com/golibertychurch/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.9.2 2.4.4.6.2 1 .5 1.5 1 .5.5.8.9 1 1.5.2.5.3 1.2.4 2.4.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-1 1.5-.5.5-.9.8-1.5 1-.5.2-1.2.3-2.4.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.5-1.5-1-.5-.5-.8-.9-1-1.5-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.9.4-2.4.2-.6.5-1 1-1.5.5-.5.9-.8 1.5-1 .5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2m0-2.2C8.7 0 8.3 0 7 0 5.7.1 4.7.3 3.9.6c-.9.3-1.6.7-2.3 1.4C.9 2.7.5 3.4.2 4.3.0 5.1-.1 6.1 0 7.4c0 1.3 0 1.7 0 4.6 0 2.9 0 3.3.1 4.6.1 1.3.3 2.3.6 3.1.3.9.7 1.6 1.4 2.3.7.7 1.4 1.1 2.3 1.4.8.3 1.8.5 3.1.6 1.3.1 1.7.1 4.6.1s3.3 0 4.6-.1c1.3-.1 2.3-.3 3.1-.6.9-.3 1.6-.7 2.3-1.4.7-.7 1.1-1.4 1.4-2.3.3-.8.5-1.8.6-3.1.1-1.3.1-1.7.1-4.6s0-3.3-.1-4.6c-.1-1.3-.3-2.3-.6-3.1-.3-.9-.7-1.6-1.4-2.3-.7-.7-1.4-1.1-2.3-1.4-.8-.3-1.8-.5-3.1-.6C15.3.1 14.9 0 12 0Z"/><path d="M12 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4Zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.5a1.44 1.44 0 1 1 0-2.88 1.44 1.44 0 0 1 0 2.88Z"/></svg></a>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<script src="./assets/site.js" defer></script>
+	<script>
+	(function(){
+		function isValidYT(id){ return /^[A-Za-z0-9_-]{11}$/.test(String(id||'')); }
+		// Rick Astley filter - known video IDs to block
+		const BLOCKED_VIDEO_IDS = ['dQw4w9WgXcQ', 'oHg5SJYRHA0', 'xvFZjo5PgG0', 'QB7ACr7pUuE', 'j5a0jTc9S10'];
+		
+		function isRickAstley(videoId) {
+			return BLOCKED_VIDEO_IDS.includes(videoId);
+		}
+		
+		function isBlockedContent(title = '', description = '', videoId = '') {
+			if (isRickAstley(videoId)) return true;
+			const content = (title + ' ' + description).toLowerCase();
+			const rickPatterns = ['rick astley', 'never gonna give you up', 'rickroll', 'rick roll'];
+			return rickPatterns.some(pattern => content.includes(pattern));
+		}
+		
+		function ytIframe(id){
+			if(!isValidYT(id)) return '';
+			if(isRickAstley(id)) {
+				return `<div style="padding: 2rem; text-align: center; background: #f3f4f6; border-radius: 8px;"><p>🙅‍♂️ This content is not available for playback.</p><p><em>Please select another sermon from the list below.</em></p></div>`;
+			}
+			return `<iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+		}
+		function play(id, title = '', description = ''){
+			if(!isValidYT(id)) return; // do nothing if invalid
+			if(isBlockedContent(title, description, id)) {
+				const el=document.getElementById('sermonPlayer');
+				if(el) el.innerHTML = `<div class="content"><div style="padding: 2rem; text-align: center; background: #f3f4f6; border-radius: 8px;"><p>🙅‍♂️ This content is not available for playback.</p><p><em>Please select another sermon from the list below.</em></p></div></div>`;
+				return;
+			}
+			const el=document.getElementById('sermonPlayer');
+			if(el) el.innerHTML = `<div class="content">${ytIframe(id)}</div>`;
+			if(el) window.scrollTo({ top: el.offsetTop - 90, behavior: 'smooth' });
+		}
+		function cardHTML(v){
+			const d = v.publishedAt? new Date(v.publishedAt).toLocaleDateString() : '';
+			return `<article class="card" data-id="${v.id}">
+				<img src="${v.thumbnail||''}" alt="" style="width:100%;height:auto;border-radius:10px"/>
+				<h3>${v.title||'Untitled'}</h3>
+				<p class="muted">${d}</p>
+			</article>`;
+		}
+		function listItemHTML(v){
+			const d = v.publishedAt? new Date(v.publishedAt).toLocaleDateString() : '';
+			return `<li><button class="btn ghost" data-id="${v.id}">${v.title||'Untitled'}</button> <span class="muted">${d}</span></li>`;
+		}
+		// YouTube API Configuration
+		const YOUTUBE_API_KEY = 'AIzaSyBS9_su0RuHFjI0Xxibg0f3QJxnD1vGldo';
+		const YOUTUBE_CHANNEL_ID = 'UC3OOjkWTTRf0fKDK5Z2o93A';
+
+		// YouTube API functions
+		async function fetchFromYouTube(endpoint) {
+			const baseUrl = 'https://www.googleapis.com/youtube/v3';
+			const url = `${baseUrl}${endpoint}&key=${YOUTUBE_API_KEY}`;
+			
+			try {
+				const response = await fetch(url, { cache: 'no-store' }); // Force fresh data
+				if (!response.ok) {
+					throw new Error(`YouTube API error: ${response.status}`);
+				}
+				return await response.json();
+			} catch (error) {
+				console.error('YouTube API fetch error:', error);
+				return null;
+			}
+		}
+
+		async function getChannelVideos(maxResults = 50) {
+			const data = await fetchFromYouTube(
+				`/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&order=date&type=video&maxResults=${maxResults}`
+			);
+			
+			if (!data || !data.items) return [];
+			
+			// Filter out deleted/unavailable videos by checking if they have valid data
+			return data.items.filter(item => {
+				return item.id && item.id.videoId && item.snippet && item.snippet.title && 
+				       !item.snippet.title.includes('[Deleted video]') && 
+				       !item.snippet.title.includes('[Private video]');
+			}).map(item => ({
+				id: item.id.videoId,
+				title: item.snippet.title,
+				publishedAt: item.snippet.publishedAt,
+				thumbnail: item.snippet.thumbnails?.medium?.url || '',
+				description: item.snippet.description || ''
+			}));
+		}
+
+		async function refreshVideoData() {
+			console.log('Refreshing video data from YouTube...');
+			try {
+				const freshVideos = await getChannelVideos(50);
+				console.log(`Fetched ${freshVideos.length} fresh videos from YouTube`);
+				return { recent: freshVideos, playlists: [] };
+			} catch (error) {
+				console.error('Failed to refresh video data:', error);
+				return null;
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', async ()=>{
+			// Try to fetch fresh data from YouTube API first
+			let data = await refreshVideoData();
+			
+			// Fallback to local JSON if YouTube API fails
+			if (!data || !data.recent || data.recent.length === 0) {
+				console.log('Falling back to local JSON data...');
+				data = await fetch('./assets/data/sermons.json', { cache:'no-store' }).then(r=>r.json()).catch(()=>null);
+			}
+			
+			const archived = await fetch('./assets/data/archived.json', { cache:'no-store' }).then(r=>r.json()).catch(()=>[]);
+			const player = document.getElementById('sermonPlayer');
+			// Filter out blocked content and use first valid recent video
+			if(player){
+				if(data?.recent?.length){
+					const validVideos = data.recent.filter(video => !isBlockedContent(video.title, video.description, video.id));
+					if(validVideos.length > 0) {
+						const first = validVideos[0];
+						if(first?.id && isValidYT(first.id)){
+							player.innerHTML = `<div class="content">${ytIframe(first.id)}</div>`;
+						}
+					} else {
+						player.innerHTML = `<div class="content placeholder" style="padding:28px;">No valid sermons available yet.</div>`;
+					}
+				}else{
+					player.innerHTML = `<div class="content placeholder" style="padding:28px;">No sermons available yet.</div>`;
+				}
+			}
+
+			// Recently Uploaded with load more + collapse controls below grid
+			if(data?.recent?.length){
+				const wrap = document.getElementById('recentGrid');
+				const controls = document.getElementById('recentControls');
+				const btnMore = document.getElementById('btnMoreRecent');
+				const btnCollapse = document.getElementById('btnCollapseRecent');
+				const INITIAL_COUNT = 6;
+				let recentShown = INITIAL_COUNT;
+				function renderRecent(){
+					wrap.innerHTML = data.recent.slice(0, recentShown).map(cardHTML).join('');
+					if(data.recent.length > INITIAL_COUNT){
+						controls.hidden = false;
+						btnMore.hidden = recentShown >= data.recent.length;
+						btnCollapse.hidden = recentShown <= INITIAL_COUNT;
+					}else{
+						controls.hidden = true;
+					}
+				}
+				wrap.addEventListener('click', (e)=>{
+					const card = e.target.closest('article.card'); if(!card) return;
+					const id = card.getAttribute('data-id'); if(id) play(id);
+				});
+				if(btnMore){ btnMore.addEventListener('click', ()=>{ recentShown += 6; if(recentShown > data.recent.length) recentShown = data.recent.length; renderRecent(); }); }
+				if(btnCollapse){ btnCollapse.addEventListener('click', ()=>{ recentShown = INITIAL_COUNT; renderRecent(); wrap.scrollIntoView({behavior:'smooth', block:'start'}); }); }
+				renderRecent();
+			}
+
+			// Series (playlist accordion) neutral style
+			if(data?.playlists?.length){
+				const list = document.getElementById('seriesList');
+				list.innerHTML = data.playlists.map(p=>{
+					const panelId = `pl_${p.id}`;
+					const initial = (p.items||[]).slice(0,8);
+					const remaining = (p.items||[]).length - initial.length;
+					return `<div class="series-item">
+						<button class="series-toggle" data-toggle="${panelId}" aria-expanded="false" aria-controls="${panelId}">
+							<span class="series-title">${p.title||'Series'}</span>
+							<span class="series-meta"><span>${p.itemCount||0} messages</span><span class="chevron" aria-hidden="true"></span></span>
+						</button>
+						<div id="${panelId}" class="series-panel" hidden>
+							<ul class="list" data-playlist="${p.id}" data-shown="8">${initial.map(listItemHTML).join('')}</ul>
+							${remaining>0?`<button class=\"btn small\" data-more=\"${p.id}\">Load more (${remaining})</button>`:''}
+						</div>
+					</div>`;
+				}).join('');
+				list.addEventListener('click', (e)=>{
+					const toggleBtn = e.target.closest('button[data-toggle]');
+					if(toggleBtn){
+						const id = toggleBtn.getAttribute('data-toggle');
+						const panel = document.getElementById(id);
+						if(panel){
+							const exp = toggleBtn.getAttribute('aria-expanded')==='true';
+							toggleBtn.setAttribute('aria-expanded', String(!exp));
+							panel.hidden = exp;
+						}
+						return;
+					}
+					const more = e.target.closest('button[data-more]');
+					if(more){
+						const pid = more.getAttribute('data-more');
+						const pl = data.playlists.find(pp=>pp.id===pid);
+						const ul = list.querySelector(`ul[data-playlist="${pid}"]`);
+						if(pl && ul){
+							let shown = Number(ul.getAttribute('data-shown'))||0;
+							const next = pl.items.slice(shown, shown+10);
+							ul.insertAdjacentHTML('beforeend', next.map(listItemHTML).join(''));
+							shown += next.length;
+							ul.setAttribute('data-shown', String(shown));
+							if(shown >= pl.items.length){ more.remove(); }
+						}
+						return;
+					}
+					const liBtn = e.target.closest('button[data-id]');
+					if(liBtn){ play(liBtn.getAttribute('data-id')); }
+				});
+			}
+
+			// Archived as a collapsible list
+			if(archived?.length){
+				const ul = document.getElementById('archivedUl');
+				ul.innerHTML = archived.map(listItemHTML).join('');
+				ul.addEventListener('click', (e)=>{
+					const liBtn = e.target.closest('button[data-id]'); if(liBtn) play(liBtn.getAttribute('data-id'));
+				});
+				const toggle = document.getElementById('toggleArchived');
+				const panel = document.getElementById('archivedList');
+				if(toggle && panel){ toggle.addEventListener('click', ()=>{ const exp = toggle.getAttribute('aria-expanded')==='true'; toggle.setAttribute('aria-expanded', String(!exp)); panel.hidden = exp; toggle.textContent = exp? 'Show archived' : 'Hide archived'; }); }
+			}
+		});
+	})();
+	</script>
+</body>
+</html>

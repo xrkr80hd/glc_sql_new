@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+  "Come unto me, all ye that labour and are heavy laden, and I will give you rest." - Matthew 11:28
+  
+  Jesus, draw every visitor to Yourself. Prepare their hearts before they arrive.
+  Let them feel Your presence, find their home in You, and discover the family
+  You've prepared for them at Liberty Church. Amen.
+-->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan a Visit — Liberty Church</title>
+  <!-- "And let us consider how we may spur one another on toward love and good deeds, not giving up meeting together" - Hebrews 10:24-25 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/style.css" />
+<link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+<!-- Holy Spirit, prepare every heart that visits this page to encounter Jesus -->
+</head>
+<body>
+  <header class="header site-header">
+    <div class="container nav">
+  <a class="brand" href="https://www.golibertychurch.com/index.html"><img src="assets/logo.png" alt="Liberty Church logo"><span class="name">Liberty Church</span></a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="mainNav"><span class="hamburger" aria-hidden="true"></span><span class="sr-only">Open navigation</span></button>
+      <nav id="mainNav">
+        <ul>
+          <li><a href="https://www.golibertychurch.com/live.html">Watch Live <span id="navLiveDot" class="live-indicator idle"><span class="dot"></span>LIVE</span></a></li>
+          <li><a href="https://www.golibertychurch.com/index.html">Home</a></li>
+          <li><a href="https://www.golibertychurch.com/youth.html">LC Youth</a></li>
+          <li><a href="https://www.golibertychurch.com/beliefs.html">Beliefs</a></li>
+          <li><a href="https://www.golibertychurch.com/sermons.html">Sermons</a></li>
+          <li><a href="https://www.golibertychurch.com/prayer.html">Prayer</a></li>
+          <li><a href="https://www.golibertychurch.com/give.html">Give</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h1>Plan Your Visit</h1>
+          <p class="muted">We can't wait to meet you.</p>
+        </div>
+        <form class="form" id="visitForm">
+          <input type="hidden" name="_captcha" value="false">
+          <div class="row">
+            <div><label>First & Last Name<br/><input required name="name" placeholder="Your name"></label></div>
+            <div><label>Email<br/><input required type="email" name="email" placeholder="you@example.com"></label></div>
+          </div>
+          <div class="row">
+            <div><label>Phone<br/><input name="phone" placeholder="(###) ###-####"></label></div>
+            <div><label>Visit Date<br/><input type="date" name="date"></label></div>
+          </div>
+          <label>How many are coming?<br/><select name="party"><option value="1">1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></label>
+          <label>Anything we can prepare for?<br/><textarea name="notes" rows="4" placeholder="Kids check‑in, accessibility needs, prayer requests…"></textarea></label>
+          <div>
+            <button class="btn" type="submit">Send</button>
+          </div>
+        </form>
+        <div id="visitMsg" class="mt-8"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>Find Us</h2>
+        <div class="map">
+          <iframe title="Map to Liberty Church" frameborder="0"
+            src="https://www.google.com/maps?q=100%20McKeithen%20Dr%2C%20Alexandria%2C%20LA%2071303&output=embed" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand brand-footer"><img class="footer-logo" src="assets/logo.png" alt="Liberty Church logo" /> <span class="brand-text">Liberty Church</span></div>
+        <p class="muted">© <span id="year"></span> Liberty Church. All rights reserved.</p>
+        <p class="muted" style="margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">Made with love by <a href="https://www.xrkr80hd.studio" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">xrkr80hd designs</a></p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <address id="footerAddress">100 McKeithen Dr, Alexandria, LA 71303</address>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <div class="social-footer">
+          <a id="youtubeLink" class="icon-btn" href="https://www.youtube.com/@GoLibertyChurch" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2s-.2-1.7-.8-2.4c-.7-.9-1.5-.9-1.9-1C17.9 2.4 12 2.4 12 2.4h0s-5.9 0-8.8.4c-.4.1-1.2.1-1.9 1-.6.7-.8 2.4-.8 2.4S0 8.2 0 10.1v1.7c0 1.9.2 3.9.2 3.9s.2 1.7.8 2.4c.7.9 1.6.9 2 1 1.5.1 6.6.4 8.6.4h1.6c2-.1 7.1-.3 8.6-.4.4-.1 1.2-.1 1.9-1 .6-.7.8-2.4.8-2.4s.2-1.9.2-3.9v-1.7c0-1.9-.2-3.9-.2-3.9ZM9.6 13.9V7.8l6.2 3-6.2 3.1Z"/></svg></a>
+          <a id="facebookLink" class="icon-btn" href="https://www.facebook.com/GoLibertyChurch" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.406.593 24 1.325 24H12.82v-9.294H9.692V11.08h3.127V8.414c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.463.098 2.795.142v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.764v2.313h3.588l-.467 3.625h-3.12V24h6.116C23.406 24 24 23.406 24 22.674V1.326C24 .593 23.406 0 22.675 0Z"/></svg></a>
+          <a id="instagramLink" class="icon-btn" href="https://www.instagram.com/golibertychurch/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.9.2 2.4.4.6.2 1 .5 1.5 1 .5.5.8.9 1 1.5.2.5.3 1.2.4 2.4.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-1 1.5-.5.5-.9.8-1.5 1-.5.2-1.2.3-2.4.4-1.3.1-1.7.1-4.9.1s-3.3 0-4.9-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.5-1.5-1-.5-.5-.8-.9-1-1.5-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.9.4-2.4.2-.6.5-1 1-1.5.5-.5.9-.8 1.5-1 .5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2m0-2.2C8.7 0 8.3 0 7 0 5.7.1 4.7.3 3.9.6c-.9.3-1.6.7-2.3 1.4C.9 2.7.5 3.4.2 4.3.0 5.1-.1 6.1 0 7.4c0 1.3 0 1.7 0 4.6 0 2.9 0 3.3.1 4.6.1 1.3.3 2.3.6 3.1.3.9.7 1.6 1.4 2.3.7.7 1.4 1.1 2.3 1.4.8.3 1.8.5 3.1.6 1.3.1 1.7.1 4.6.1s3.3 0 4.6-.1c1.3-.1 2.3-.3 3.1-.6.9-.3 1.6-.7 2.3-1.4.7-.7 1.1-1.4 1.4-2.3.3-.8.5-1.8.6-3.1.1-1.3.1-1.7.1-4.6s0-3.3-.1-4.6c-.1-1.3-.3-2.3-.6-3.1-.3-.9-.7-1.6-1.4-2.3-.7-.7-1.4-1.1-2.3-1.4-.8-.3-1.8-.5-3.1-.6C15.3.1 14.9 0 12 0Z"/><path d="M12 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4Zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.5a1.44 1.44 0 1 1 0-2.88 1.44 1.44 0 0 1 0 2.88Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Submit via Formsubmit.co AJAX
+    document.addEventListener('DOMContentLoaded',()=>{
+      const form=document.getElementById('visitForm');
+      const msg=document.getElementById('visitMsg');
+      document.getElementById('year').textContent = new Date().getFullYear();
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        msg.textContent='Sending...';
+        const formData = new FormData(form);
+        const payload = {
+          name: (formData.get('name') || '').toString().trim(),
+          email: (formData.get('email') || '').toString().trim(),
+          phone: (formData.get('phone') || '').toString().trim(),
+          date: (formData.get('date') || '').toString().trim(),
+          party: (formData.get('party') || '').toString().trim(),
+          notes: (formData.get('notes') || '').toString().trim()
+        };
+
+        try{
+          const res = await fetch('/api/visit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const j = await res.json().catch(()=>({ success:false }));
+          if(res.ok && j.success){
+            msg.textContent = j.message || 'Thanks — your visit request has been sent.';
+            form.reset();
+          } else {
+            msg.textContent = j.message || 'Sorry, unable to send. Please try again later.';
+            console.warn('visit submit', j);
+          }
+        }catch(err){ msg.textContent='Network error sending request.'; console.error(err); }
+      });
+    });
+  </script>
+  <script src="./assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Scheduler - Liberty Church Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .task-card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 10px 0; background: #fafafa; }
+        .task-header { display: flex; justify-content: space-between; align-items: center; }
+        .task-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-running { background: #d4edda; color: #155724; }
+        .status-stopped { background: #f8d7da; color: #721c24; }
+        .btn { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; }
+        .info-box { background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ Liberty Church - Task Scheduler</h1>
+        <p><em>Automated tasks that replace cron jobs - no SSH required!</em></p>
+        
+        <div class="info-box">
+            <h3>📊 System Status</h3>
+            <p><strong>Server Uptime:</strong> <span id="uptime">Loading...</span></p>
+            <p><strong>Last Check:</strong> <span id="timestamp">Loading...</span></p>
+        </div>
+
+        <div id="tasksContainer">
+            <h2>🔄 Scheduled Tasks</h2>
+            <div id="tasksList">Loading tasks...</div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h2>🛠️ Manual Actions</h2>
+            <button class="btn" onclick="refreshSermons()">🎥 Refresh Sermons</button>
+            <button class="btn btn-warning" onclick="backupDatabase()">💾 Backup Database</button>
+            <button class="btn btn-success" onclick="refreshStatus()">🔄 Refresh Status</button>
+        </div>
+    </div>
+
+    <script>
+        let tasks = {
+            'sermon-refresh': { name: 'Sermon Refresh', schedule: 'Daily at 6:00 AM', description: 'Updates sermon videos from YouTube API' },
+            'database-backup': { name: 'Database Backup', schedule: 'Weekly on Sundays at 2:00 AM', description: 'Creates automatic backup of church database' },
+            'cleanup-uploads': { name: 'Cleanup Old Files', schedule: 'Weekly on Mondays at 3:00 AM', description: 'Removes old upload files to save space' },
+            'health-check': { name: 'System Health Check', schedule: 'Every hour', description: 'Monitors system health and logs uptime' }
+        };
+
+        async function loadTaskStatus() {
+            try {
+                const response = await fetch('/api/tasks/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTasks(data.tasks);
+                    document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
+                }
+            } catch (error) {
+                console.error('Failed to load task status:', error);
+                document.getElementById('tasksList').innerHTML = '<p>❌ Failed to load task status</p>';
+            }
+        }
+
+        function displayTasks(taskStatus) {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = '';
+
+            Object.keys(tasks).forEach(taskId => {
+                const task = tasks[taskId];
+                const status = taskStatus[taskId] || { running: false, destroyed: true };
+                
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                
+                taskCard.innerHTML = `
+                    <div class="task-header">
+                        <div>
+                            <h3>${task.name}</h3>
+                            <p><strong>Schedule:</strong> ${task.schedule}</p>
+                            <p><em>${task.description}</em></p>
+                        </div>
+                        <div>
+                            <div class="task-status ${status.running ? 'status-running' : 'status-stopped'}">
+                                ${status.running ? 'Running' : 'Stopped'}
+                            </div>
+                            <button class="btn" onclick="triggerTask('${taskId}')" style="margin-top: 10px;">
+                                ▶️ Trigger Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        async function triggerTask(taskName) {
+            try {
+                const response = await fetch(`/api/tasks/${taskName}/trigger`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                    setTimeout(loadTaskStatus, 2000); // Refresh after 2 seconds
+                } else {
+                    alert(`❌ Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Failed to trigger task: ${error.message}`);
+            }
+        }
+
+        async function refreshSermons() {
+            await triggerTask('sermon-refresh');
+        }
+
+        async function backupDatabase() {
+            await triggerTask('database-backup');
+        }
+
+        function refreshStatus() {
+            loadTaskStatus();
+            loadUptime();
+        }
+
+        async function loadUptime() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.uptime) {
+                    const hours = Math.floor(data.uptime / 3600);
+                    const minutes = Math.floor((data.uptime % 3600) / 60);
+                    document.getElementById('uptime').textContent = `${hours}h ${minutes}m`;
+                }
+            } catch (error) {
+                document.getElementById('uptime').textContent = 'Error loading uptime';
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTaskStatus();
+            loadUptime();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshStatus, 30000);
+        });
+    </script>
+</body>
+</html>

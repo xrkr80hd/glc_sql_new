@@ -1,0 +1,18 @@
+# Liberty Church Apache Configuration
+# Minimal version to prevent redirect loops
+
+RewriteEngine On
+RewriteBase /
+
+# Clean admin URL - /admin goes to /php/admin/login.php
+RewriteRule ^admin/?$ php/admin/login.php [L]
+RewriteRule ^admin/(.*)$ php/admin/$1 [L]
+
+# Prevent directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|\.env|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
