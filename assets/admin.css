@@ -735,7 +735,7 @@ textarea {
 	border-radius: 12px;
 	border: 1px solid var(--admin-border);
 	background: #ffffff;
-	color: var(--admin-text);
+	color: #18412d;
 	font-size: 1.15rem;
 	font-weight: 700;
 	cursor: pointer;
@@ -754,6 +754,7 @@ textarea {
 	cursor: not-allowed;
 	opacity: 0.4;
 	box-shadow: none;
+	color: #18412d;
 }
 
 @media (max-width: 940px) {
