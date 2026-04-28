@@ -99,3 +99,12 @@
   - `where docker` finds nothing
   - no Docker Desktop install was found under the usual Program Files or Start Menu paths
   - `winget list --name Docker` did not find an installed Docker package
+- Diagnosed the live admin 500 report against the deployed host:
+  - verified the live host `.env` is using the correct MySQL settings for `golibert2_liberty_church`
+  - verified the live `announcements`, `youth-scripture`, and `youth-albums` routes currently return `302` to `/php/admin/login.php` when unauthenticated instead of `500`
+  - executed the same admin pages directly on the live server with `ADMIN_LOGIN_DISABLED=true` and confirmed they render without PHP fatals
+  - confirmed the repeated breakage risk was repo-tracked `.env` values overwriting the host credentials during deploys
+- Hardened repo config handling so deploys stop replacing live database credentials:
+  - updated `.gitignore` to ignore `.env`
+  - added `.env.example` with placeholder DB settings and `ADMIN_LOGIN_DISABLED=false`
+  - removed `.env` from git tracking while leaving the local file in place for runtime use
