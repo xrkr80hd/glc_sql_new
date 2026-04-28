@@ -1,7 +1,3 @@
--- Liberty Church Full cPanel MySQL Schema
--- Target: fresh MySQL/MariaDB database for the PHP/static site.
--- No Postgres, no Supabase, no stored procedures.
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 SET NAMES utf8mb4;
