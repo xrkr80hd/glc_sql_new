@@ -5,23 +5,14 @@ class LiveStreamManager {
         this.updateInterval = 60000; // 60 seconds
         this.retryCount = 0;
         this.maxRetries = 3;
-        this.isManualMode = false;
 
         this.init();
     }
 
     init() {
-        if (this.isManualMode) {
-            this.showManualMode();
-        } else {
-            this.loadLiveStream();
-            this.startAutoRefresh();
-        }
+        this.loadLiveStream();
+        this.startAutoRefresh();
         console.log('🎥 Live Stream Manager initialized');
-    }
-
-    showManualMode() {
-        this.renderFallbackVideo();
     }
 
     async loadLiveStream() {
@@ -43,66 +34,24 @@ class LiveStreamManager {
     }
 
     updateStreamDisplay(streamData) {
-        if (!streamData || !streamData.isLive) {
-            this.renderFallbackVideo(streamData);
+        if (!streamData) {
+            this.renderFallbackVideo();
             return;
         }
 
-        // Stream is live - show YouTube iframe
-        this.renderLiveStream(streamData);
-    }
+        const manualMode = (streamData.manualMode || '').toUpperCase();
 
-    renderLiveStream(streamData) {
-        const ls1 = document.getElementById('LS1');
-        const ls2 = document.getElementById('LS2');
-
-        if (!ls1 || !ls2) return;
-
-        const videoId = streamData.videoId;
-        const title = streamData.title || 'Liberty Church Live Service';
-
-        // Hide fallback video, show live stream
-        ls2.style.display = 'none';
-        ls1.style.display = 'block';
-
-        if (videoId) {
-            // Beautiful live stream with same styling as sermons.html
-            ls1.innerHTML = `
-                <div class="live-indicator">
-                    <span class="live-dot"></span>
-                    <span class="live-text">LIVE NOW</span>
-                </div>
-                <div class="embed aspect-16x9">
-                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&modestbranding=1"
-                        width="560"
-                        height="315"
-                        title="${title}"
-                        frameborder="0"
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen></iframe>
-                </div>
-            `;
-            
-            console.log('🔴 LIVE: Switched to YouTube stream');
-        } else {
-            // Fallback to loading state
-            ls1.innerHTML = `
-                <div class="live-indicator">
-                    <span class="live-dot"></span>
-                    <span class="live-text">GOING LIVE SOON</span>
-                </div>
-                <div class="embed aspect-16x9">
-                    <div class="content placeholder">
-                        Live stream is starting soon. Please stay tuned.
-                    </div>
-                </div>
-            `;
+        if (manualMode === 'LS1' || streamData.isLive) {
+            this.redirectToLivePage();
+            return;
         }
 
-        // Update page title
-        document.title = '🔴 LIVE: Sunday Service | Liberty Church';
+        this.renderFallbackVideo(streamData);
+    }
+
+    redirectToLivePage() {
+        console.log('🔴 Live stream detected – redirecting to live2.html');
+        window.location.href = 'live2.html';
     }
 
     renderFallbackVideo(streamData = null) {
@@ -120,9 +69,11 @@ class LiveStreamManager {
         ls2.style.display = 'block';
 
         const upcoming = streamData && streamData.upcoming;
-        const nextServiceText = upcoming && upcoming.scheduledStart
-            ? `Next service starts ${this.formatDate(upcoming.scheduledStart)}`
-            : 'We are not currently streaming live. Join us Sundays at 10:00 AM.';
+        const nextServiceText = streamData && streamData.manualMessage
+            ? streamData.manualMessage
+            : upcoming && upcoming.scheduledStart
+                ? `Next service starts ${this.formatDate(upcoming.scheduledStart)}`
+                : 'We are not currently streaming live. Join us Sundays at 10:00 AM.';
 
         ls2.innerHTML = `
             <div class="embed aspect-16x9">
@@ -262,7 +213,9 @@ style.textContent = `
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #000 !important;
     border: 0 !important;
     border-radius: 12px;
 }

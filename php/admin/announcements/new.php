@@ -6,23 +6,24 @@ require_once __DIR__ . '/../layout.php';
 admin_require_login();
 
 $pdo = db();
+$error = trim((string) ($_GET['error'] ?? ''));
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf($_POST['csrf_token'] ?? '');
 
-    $category = trim($_POST['category'] ?? 'main');
-    $title = trim($_POST['title'] ?? '');
-    $body = trim($_POST['body'] ?? '');
-    $startDate = trim($_POST['start_date'] ?? '');
-    $endDate = trim($_POST['end_date'] ?? '');
-    $sortOrder = (int)($_POST['sort_order'] ?? 0);
-    $isPublished = isset($_POST['is_published']) ? 1 : 0;
+    $category = trim((string) ($_POST['category'] ?? 'main'));
+    $title = trim((string) ($_POST['title'] ?? ''));
+    $body = trim((string) ($_POST['body'] ?? ''));
+    $startDate = trim((string) ($_POST['start_date'] ?? ''));
+    $endDate = trim((string) ($_POST['end_date'] ?? ''));
 
     if ($title === '' || $body === '') {
-        header('Location: new.php?error=' . urlencode('Title and body are required'));
+        header('Location: new.php?error=' . urlencode('Title and body are required.'));
         exit;
     }
+
+    $nextSortStmt = $pdo->query("SELECT COALESCE(MAX(sort_order), -1) + 1 FROM announcements WHERE is_published = 1");
+    $nextSortOrder = (int) $nextSortStmt->fetchColumn();
 
     $sql = "INSERT INTO announcements (category, title, body, start_date, end_date, sort_order, is_published)
             VALUES (:category, :title, :body, :start_date, :end_date, :sort_order, :is_published)";
@@ -34,76 +35,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':body' => $body,
         ':start_date' => $startDate ?: null,
         ':end_date' => $endDate ?: null,
-        ':sort_order' => $sortOrder,
-        ':is_published' => $isPublished,
+        ':sort_order' => $nextSortOrder,
+        ':is_published' => 1,
     ]);
 
-    header('Location: index.php?message=' . urlencode('Announcement created successfully'));
+    header('Location: index.php?message=' . urlencode('Announcement published to the site.'));
     exit;
 }
 
 admin_page_start('New Announcement', 'announcements');
 ?>
 
-<section class="card">
-    <h2>Create New Announcement</h2>
-    <p class="muted">Add an announcement to the main homepage or youth page.</p>
+<?php if ($error): ?>
+    <div class="flash flash-error"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
 
-    <form method="POST" class="form">
+<section class="card announcement-card-shell">
+    <div class="announcement-page-head">
+        <h3>New Announcement</h3>
+        <p class="announcement-page-copy">Write the announcement once and publish it straight to the site. Ordering is handled from the announcements list with arrows, not by typing numbers.</p>
+    </div>
+
+    <form method="POST" class="announcement-form">
         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
-        <div class="form-group">
-            <label for="category">Category *</label>
-            <select id="category" name="category" required>
-                <option value="main">Main (Homepage)</option>
-                <option value="youth">Youth Page</option>
-                <option value="event">Event</option>
-                <option value="global">Global (All Pages)</option>
-            </select>
-            <small class="form-help">Where should this announcement appear?</small>
-        </div>
-
-        <div class="form-group">
-            <label for="title">Title *</label>
-            <input type="text" id="title" name="title" required maxlength="255" placeholder="e.g., Special Service This Sunday">
-        </div>
-
-        <div class="form-group">
-            <label for="body">Body *</label>
-            <textarea id="body" name="body" required rows="6" placeholder="Full announcement text..."></textarea>
-            <small class="form-help">Use paragraphs to break up longer announcements.</small>
-        </div>
-
-        <div class="row">
-            <div class="form-group">
-                <label for="start_date">Start Date</label>
-                <input type="date" id="start_date" name="start_date">
-                <small class="form-help">Optional: announcement won't show before this date</small>
+        <section class="announcement-section">
+            <div class="announcement-section-head">
+                <h4>Announcement Details</h4>
+                <p>Choose where it shows up, give it a title, and write the message people need to see.</p>
             </div>
 
-            <div class="form-group">
-                <label for="end_date">End Date</label>
-                <input type="date" id="end_date" name="end_date">
-                <small class="form-help">Optional: announcement will hide after this date</small>
+            <div class="announcement-grid announcement-grid-single">
+                <div class="form-group">
+                    <label for="category">Show On</label>
+                    <select id="category" name="category" required>
+                        <option value="main">Main (Homepage)</option>
+                        <option value="youth">Youth Page</option>
+                        <option value="event">Event</option>
+                        <option value="global">Global (All Pages)</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="sort_order">Sort Order</label>
-            <input type="number" id="sort_order" name="sort_order" value="0" min="0">
-            <small class="form-help">Lower numbers appear first (0 = highest priority)</small>
-        </div>
+            <div class="announcement-grid announcement-grid-single">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" required maxlength="255" placeholder="Special Service This Sunday">
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label class="checkbox">
-                <input type="checkbox" name="is_published" value="1" checked>
-                <span>Publish immediately</span>
-            </label>
-            <small class="form-help">Uncheck to save as draft</small>
-        </div>
+            <div class="announcement-grid announcement-grid-single">
+                <div class="form-group">
+                    <label for="body">Announcement</label>
+                    <textarea id="body" name="body" required rows="8" placeholder="Share the full announcement here..."></textarea>
+                </div>
+            </div>
+        </section>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Create Announcement</button>
+        <section class="announcement-section">
+            <div class="announcement-section-head">
+                <h4>Scheduling</h4>
+                <p>Leave the dates blank if this announcement should stay visible until you replace or remove it.</p>
+            </div>
+
+            <div class="announcement-grid">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date">
+                </div>
+
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date">
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions announcement-actions">
+            <button type="submit" class="btn btn-primary">Publish to Site</button>
             <a href="index.php" class="btn btn-secondary">Cancel</a>
         </div>
     </form>

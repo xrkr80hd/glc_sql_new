@@ -91,3 +91,44 @@ function media_public_url(?string $path): ?string
 
     return '/uploads/' . ltrim($path, '/');
 }
+
+function db_column_exists(PDO $pdo, string $table, string $column): bool
+{
+    static $cache = [];
+    $key = $table . '.' . $column;
+
+    if (!array_key_exists($key, $cache)) {
+        $stmt = $pdo->prepare('
+            SELECT COUNT(*) 
+            FROM information_schema.COLUMNS 
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = :table_name
+              AND COLUMN_NAME = :column_name
+        ');
+        $stmt->execute([
+            ':table_name' => $table,
+            ':column_name' => $column,
+        ]);
+        $cache[$key] = (int)$stmt->fetchColumn() > 0;
+    }
+
+    return $cache[$key];
+}
+
+function db_table_exists(PDO $pdo, string $table): bool
+{
+    static $cache = [];
+
+    if (!array_key_exists($table, $cache)) {
+        $stmt = $pdo->prepare('
+            SELECT COUNT(*)
+            FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = :table_name
+        ');
+        $stmt->execute([':table_name' => $table]);
+        $cache[$table] = (int)$stmt->fetchColumn() > 0;
+    }
+
+    return $cache[$table];
+}

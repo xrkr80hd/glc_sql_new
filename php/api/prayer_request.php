@@ -30,18 +30,45 @@ if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $pdo = db();
 
-$sql = 'INSERT INTO prayer_requests (name, email, request, share_permission)
-        VALUES (:name, :email, :request, :share_permission)';
+$hasRequestText = db_column_exists($pdo, 'prayer_requests', 'request_text');
+$hasStatus = db_column_exists($pdo, 'prayer_requests', 'status');
+$hasSubmittedAt = db_column_exists($pdo, 'prayer_requests', 'submitted_at');
+
+$columns = ['name', 'email', 'request', 'share_permission'];
+$values = [':name', ':email', ':request', ':share_permission'];
+$params = [
+    ':name' => $name !== '' ? $name : null,
+    ':email' => $email !== '' ? $email : null,
+    ':request' => $requestText,
+    ':share_permission' => $allowShare ? 1 : 0,
+];
+
+if ($hasRequestText) {
+    $columns[] = 'request_text';
+    $values[] = ':request_text';
+    $params[':request_text'] = $requestText;
+}
+
+if ($hasStatus) {
+    $columns[] = 'status';
+    $values[] = "'new'";
+}
+
+if ($hasSubmittedAt) {
+    $columns[] = 'submitted_at';
+    $values[] = 'NOW()';
+}
+
+$sql = sprintf(
+    'INSERT INTO prayer_requests (%s) VALUES (%s)',
+    implode(', ', $columns),
+    implode(', ', $values)
+);
 
 $stmt = $pdo->prepare($sql);
 
 try {
-    $stmt->execute([
-        ':name' => $name !== '' ? $name : null,
-        ':email' => $email !== '' ? $email : null,
-        ':request' => $requestText,
-        ':share_permission' => $allowShare ? 1 : 0,
-    ]);
+    $stmt->execute($params);
 } catch (PDOException $e) {
     error_log('Failed to save prayer request: ' . $e->getMessage());
     fail('We could not send your request right now. Please try again soon.', 500);

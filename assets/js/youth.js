@@ -99,10 +99,12 @@ function renderAnnouncements(announcements) {
   }
 
   grid.innerHTML = announcements.map((item) => {
-    const dateLabel = item.event_date
-      ? `<div class="announcement-meta">📅 ${escapeHtml(formatDateValue(item.event_date))}</div>`
+    const eventDate = item.event_date || item.start_date || '';
+    const dateLabel = eventDate
+      ? `<div class="announcement-meta">📅 ${escapeHtml(formatDateValue(eventDate))}</div>`
       : '';
-    const content = item.content ? `<div class="announcement-copy">${formatInline(item.content)}</div>` : '';
+    const contentText = item.content || item.body || '';
+    const content = contentText ? `<div class="announcement-copy">${formatInline(contentText)}</div>` : '';
     return `
       <article class="announcement-card">
         ${dateLabel}

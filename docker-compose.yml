@@ -1,0 +1,60 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/php-apache/Dockerfile
+    container_name: glc_og_updating_web
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: golibert2_liberty_church
+      DB_USER: golibert2_liberty_church_user
+      DB_PASS: "@LibertyChurch1065!"
+      DB_PASSWORD: "@LibertyChurch1065!"
+      DB_CHARSET: utf8mb4
+      ADMIN_LOGIN_DISABLED: "true"
+    ports:
+      - "8089:80"
+    volumes:
+      - ./:/var/www/html
+      - ./uploads:/var/www/html/uploads
+
+  db:
+    image: mariadb:11.4
+    container_name: glc_og_updating_db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: glc_root_local_only
+      MARIADB_DATABASE: golibert2_liberty_church
+      MARIADB_USER: golibert2_liberty_church_user
+      MARIADB_PASSWORD: "@LibertyChurch1065!"
+    ports:
+      - "3307:3306"
+    volumes:
+      - glc_og_db:/var/lib/mysql
+      - ./database/glc_cpanel_full_schema.sql:/docker-entrypoint-initdb.d/001_glc_cpanel_full_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -p$${MARIADB_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  phpmyadmin:
+    image: phpmyadmin:5-apache
+    container_name: glc_og_updating_phpmyadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: golibert2_liberty_church_user
+      PMA_PASSWORD: "@LibertyChurch1065!"
+    ports:
+      - "8090:80"
+
+volumes:
+  glc_og_db:

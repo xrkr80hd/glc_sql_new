@@ -5,14 +5,131 @@ require_once __DIR__ . '/layout.php';
 
 admin_require_login();
 
-$pdo = db();
+$pdo = null;
+$databaseError = null;
+
+try {
+    $pdo = db();
+} catch (Throwable $e) {
+    $databaseError = $e->getMessage();
+}
+
+if (!defined('LIBERTY_CHURCH_DASHBOARD_VERSION')) {
+    define('LIBERTY_CHURCH_DASHBOARD_VERSION', '2025-10-07T05:30:00Z');
+    if (function_exists('error_log')) {
+        error_log('[Dashboard] Loaded ' . LIBERTY_CHURCH_DASHBOARD_VERSION);
+    }
+}
+
+if (!$pdo) {
+    $drivers = PDO::getAvailableDrivers();
+    admin_page_start('Dashboard', 'dashboard');
+    ?>
+    <section class="card">
+        <h3>Local Database Setup Needed</h3>
+        <p class="muted">
+            The admin login gate is disabled for local conversion work, but the dashboard still needs a MySQL database connection before content tools can load.
+        </p>
+        <div class="flash flash-error"><?= htmlspecialchars($databaseError ?: 'Database connection is unavailable.') ?></div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Configured host</th>
+                    <td><?= htmlspecialchars(DB_HOST) ?></td>
+                </tr>
+                <tr>
+                    <th>Configured database</th>
+                    <td><?= htmlspecialchars(DB_NAME) ?></td>
+                </tr>
+                <tr>
+                    <th>Configured user</th>
+                    <td><?= htmlspecialchars(DB_USER) ?></td>
+                </tr>
+                <tr>
+                    <th>Available PDO drivers</th>
+                    <td><?= htmlspecialchars($drivers ? implode(', ', $drivers) : 'none') ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            For cPanel, run <code>database/glc_cpanel_full_schema.sql</code> in the target MySQL/MariaDB database, then update <code>php/config.php</code> with that database name and user.
+        </p>
+        <p>
+            For this Windows local server, PHP also needs the <code>pdo_mysql</code> extension enabled before it can connect to MySQL.
+        </p>
+    </section>
+    <?php
+    admin_page_end();
+    return;
+}
+
+/**
+ * Determine whether a table exposes the given column using SHOW COLUMNS (identifiers can't be parameterized)
+ */
+function dashboard_table_has_column(PDO $pdo, string $table, string $column): bool
+{
+    // Sanitize table name to prevent injection
+    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+
+    if ($table === '') {
+        if (function_exists('error_log')) {
+            error_log('[Dashboard] Invalid table name detected when checking columns.');
+        }
+        return false;
+    }
+
+    $stmt = $pdo->query("SHOW COLUMNS FROM `{$table}`");
+    if ($stmt === false) {
+        if (function_exists('error_log')) {
+            error_log('[Dashboard] Unable to inspect columns for ' . $table);
+        }
+        return false;
+    }
+
+    $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return in_array($column, $columns, true);
+}
+
+/**
+ * Count records with optional equality filters, skipping any filters tied to missing columns.
+ *
+ * @param array<string, scalar> $filters
+ */
+function dashboard_count(PDO $pdo, string $table, array $filters = []): int
+{
+    $whereParts = [];
+    $params = [];
+
+    foreach ($filters as $column => $value) {
+        if (!dashboard_table_has_column($pdo, $table, $column)) {
+            if (function_exists('error_log')) {
+                error_log("[Dashboard] Column {$table}.{$column} missing; skipping filter");
+            }
+            continue;
+        }
+
+        $paramName = ':p' . count($params);
+        $whereParts[] = "`{$column}` = {$paramName}";
+        $params[$paramName] = $value;
+    }
+
+    $sql = "SELECT COUNT(*) FROM `{$table}`";
+    if ($whereParts) {
+        $sql .= ' WHERE ' . implode(' AND ', $whereParts);
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    return (int) $stmt->fetchColumn();
+}
 
 $metrics = [
-    'active_announcements' => (int) $pdo->query("SELECT COUNT(*) FROM announcements WHERE is_published = 1")->fetchColumn(),
-    'prayer_open'          => (int) $pdo->query("SELECT COUNT(*) FROM prayer_requests WHERE is_prayed = 0")->fetchColumn(),
-    'visit_new'            => (int) $pdo->query("SELECT COUNT(*) FROM visit_submissions WHERE is_read = 0")->fetchColumn(),
-    'youth_albums'         => (int) $pdo->query("SELECT COUNT(*) FROM youth_albums WHERE is_published = 1")->fetchColumn(),
-    'youth_media'          => (int) $pdo->query("SELECT COUNT(*) FROM youth_media")->fetchColumn(),
+    'active_announcements' => dashboard_count($pdo, 'announcements', ['is_published' => 1]),
+    'prayer_open'          => dashboard_count($pdo, 'prayer_requests', ['is_prayed' => 0]),
+    'visit_new'            => dashboard_count($pdo, 'visit_submissions', ['is_read' => 0]),
+    'youth_albums'         => dashboard_count($pdo, 'youth_albums', ['is_published' => 1]),
+    'youth_media'          => dashboard_count($pdo, 'youth_media'),
 ];
 
 $recentVisits = $pdo->query("SELECT name, email, visit_date, created_at FROM visit_submissions ORDER BY created_at DESC LIMIT 5")->fetchAll();

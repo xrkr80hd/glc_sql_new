@@ -22,17 +22,17 @@ try {
         $photos->execute([$row['id']]);
         $imgs = $photos->fetchAll();
         if ($imgs) {
-            echo '<div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:12px 0 16px;">';
+            echo '<div class="announcement-gallery youth">';
             foreach ($imgs as $im) {
-                echo '<img loading="lazy" src="', htmlspecialchars($im['file_path']), '" alt="', htmlspecialchars($im['alt'] ?? ''), '" style="width:100%;height:160px;object-fit:cover;border-radius:12px;box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">';
+                echo '<img loading="lazy" class="announcement-photo" src="', htmlspecialchars($im['file_path']), '" alt="', htmlspecialchars($im['alt'] ?? ''), '">';
             }
             echo '</div>';
         }
         echo '<p>', nl2br(htmlspecialchars($row['body'])), '</p></div>';
     }
     if ($count === 0) {
-        echo '<div class="ann-item youth-cosmic" style="opacity: 0.7; font-style: italic;">No youth announcements at this time.</div>';
+        echo '<div class="ann-item youth-cosmic announcement-empty">No youth announcements at this time.</div>';
     }
 } catch (Throwable $e) {
-    echo '<div class="ann-item youth-cosmic" style="opacity: 0.7; font-style: italic;">Youth announcements are temporarily unavailable.</div>';
+    echo '<div class="ann-item youth-cosmic announcement-empty">Youth announcements are temporarily unavailable.</div>';
 }

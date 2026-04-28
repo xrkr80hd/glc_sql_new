@@ -1,0 +1,101 @@
+# Completed Work
+
+## Workflow
+
+- Log completed work here after finishing a task.
+- Before closing a task, re-check `PLANNED_WORK.md` and make sure anything missed is either completed or still explicitly queued.
+- Keep completed entries specific enough that another agent can resume from this repo without reading chat history.
+
+## Completed Items
+
+- Created repo-visible work logs for `D:\GLC_OG_UPDATING`:
+  - `PLANNED_WORK.md`
+  - `COMPLETED_WORK.md`
+- Recorded the active build constraint: `GLC_OG_UPDATING` is the implementation repo, and `GLC_LOCAL_LACIE_MAIN` is a reference artifact only.
+- Recorded the active conversion goal: translate the Postgres/Supabase site behavior into PHP/static/MySQL for cPanel-style hosting.
+- Recorded the deployment constraint: no git push/commit/deploy automation; serve and validate locally, then the user will SSH/upload manually.
+- Used read-only agents to map the database/schema gap, public top-bar/header gap, and admin/API parity gap between `GLC_LOCAL_LACIE_MAIN` and `GLC_OG_UPDATING`.
+- Updated the public top bars on `index.html`, `live.html`, `live2.html`, `youth.html`, `sermons.html`, `prayer.html`, `beliefs.html`, `give.html`, and `visit.html` so the nav follows the reference order/language: Home, Live, Youth, Sermons, Prayer, Beliefs, Give, Plan Visit.
+- Updated `assets/style.css` so the public header uses the reference-style dark green sticky bar, white nav text, flat active states, and dark mobile dropdown.
+- Updated `includes/header.php` to use the same top-bar structure for PHP-rendered pages.
+- Added `database/glc_next_parity_mysql.sql` as an existing-database parity migration for the translated MySQL schema.
+- Added `database/glc_cpanel_full_schema.sql` as a fresh cPanel MySQL/MariaDB full schema with no Postgres and no stored procedures.
+- Added schema-detection helpers in `php/api/_bootstrap.php` so public APIs can work before and after the parity columns exist.
+- Updated public API scripts to read/write the new MySQL parity columns when present:
+  - `php/api/announcements_main.php`
+  - `php/api/youth.php`
+  - `php/api/current_stream.php`
+  - `php/api/visit.php`
+  - `php/api/prayer_request.php`
+- Started a local PHP server at `http://127.0.0.1:8088` for validation.
+- Verified with PHP syntax checks:
+  - `includes/header.php`
+  - `php/api/_bootstrap.php`
+  - `php/api/announcements_main.php`
+  - `php/api/youth.php`
+  - `php/api/current_stream.php`
+  - `php/api/visit.php`
+  - `php/api/prayer_request.php`
+- Verified browser/local smoke checks:
+  - `http://127.0.0.1:8088/index.html` returns 200
+  - `http://127.0.0.1:8088/youth.html` returns 200
+  - `http://127.0.0.1:8088/database/glc_cpanel_full_schema.sql` returns 200
+  - Playwright confirmed desktop header order and mobile hamburger dropdown on the home page.
+- Replaced the `youth.html` header logo reference with the cloned reference asset from `GLC_LOCAL_LACIE_MAIN`:
+  - copied `D:\GLC_LOCAL_LACIE_MAIN\public\assets\lc_youth_logo_new.png`
+  - added `assets/lc_youth_logo_new.png`
+  - updated `youth.html` to use `assets/lc_youth_logo_new.png`
+- Verified the cloned youth logo hash matches the reference asset and that both `http://127.0.0.1:8088/youth.html` and `http://127.0.0.1:8088/assets/lc_youth_logo_new.png` return 200.
+- Disabled the OG_UPDATING admin login gate for local conversion work:
+  - added `ADMIN_LOGIN_DISABLED = true` in `php/config.php`
+  - updated `php/admin/bootstrap.php` so admin pages receive a local `pastor` admin session automatically
+  - updated `guard_auth()` compatibility behavior for legacy admin guards
+- Verified `php/config.php` and `php/admin/bootstrap.php` pass PHP syntax checks.
+- Verified `php/admin/login.php` redirects to `php/admin/dashboard.php`; the dashboard still depends on the configured MySQL database and currently returns 500 if that database is unavailable locally.
+- Changed local conversion-mode database failures so `php/admin/dashboard.php` opens with a setup notice instead of a hard 500 when MySQL/PDO MySQL is unavailable.
+- Verified `php/config.php` and `php/admin/dashboard.php` pass PHP syntax checks.
+- Verified `http://127.0.0.1:8088/php/admin/dashboard.php` now returns 200 and shows `Local Database Setup Needed` when the local MySQL connection is unavailable.
+- Started admin UI parity work against the `GLC_LOCAL_LACIE_MAIN` reference without modifying the reference repo.
+- Reworked `php/admin/layout.php` into a dark reference-style admin shell:
+  - centered top bar with signed-in meta
+  - top actions for refresh, visit site, and log out
+  - fixed side launcher
+  - slide-out grouped resource drawer
+  - resource groups matching the reference admin: Main Page, Youth Page, Live Stream / Sermons, Team & Access, Operations, Requests
+  - existing PHP admin pages still route through their current screens while missing parity modules are marked as coming soon in the drawer
+- Added dark admin-shell styling to `assets/admin.css` so current PHP admin pages inherit the reference-like palette, panels, drawer, buttons, forms, and tables.
+- Verified `php/admin/layout.php` passes PHP syntax checks.
+- Verified `http://127.0.0.1:8088/php/admin/dashboard.php` returns 200 with the new admin shell and grouped resource menu.
+- Fixed the admin side drawer accordion behavior:
+  - hardened the drawer/group JavaScript in `php/admin/layout.php`
+  - initialized each group state on load
+  - kept `aria-expanded`, collapsed classes, and `hidden` state in sync
+  - prevented disabled coming-soon drawer links from changing the page hash
+  - added scoped CSS in `assets/admin.css` so hidden accordion groups render as `display: none`
+- Verified the admin drawer in Playwright:
+  - drawer launcher opens the resource drawer
+  - first accordion collapses with `aria-expanded="false"`, `hidden=true`, and `display: none`
+  - clicking again reopens it with `aria-expanded="true"`, `hidden=false`, and `display: grid`
+- Verified `php/admin/layout.php` still passes PHP syntax checks and `http://127.0.0.1:8088/php/admin/dashboard.php` returns 200.
+- Corrected the side drawer from graphic toggles into true accordion behavior:
+  - groups now start collapsed unless the current admin section is active
+  - opening one group closes the other groups
+  - collapsed groups remove the body from layout so the drawer visibly shrinks
+  - Playwright verified dashboard initial state has all groups collapsed, opening Main expands it, and opening Youth collapses Main.
+- Added Docker local database/runtime support for `GLC_OG_UPDATING`:
+  - added `docker-compose.yml` with PHP/Apache, MariaDB, and phpMyAdmin services
+  - added `docker/php-apache/Dockerfile` that installs `pdo_mysql` and `mysqli`
+  - added `.dockerignore`
+  - wired MariaDB to seed from `database/glc_cpanel_full_schema.sql` on first container startup
+  - exposed the Docker web app on `http://127.0.0.1:8089`
+  - exposed phpMyAdmin on `http://127.0.0.1:8090`
+- Updated `php/config.php` so Docker/XAMPP/cPanel environment variables can override defaults:
+  - supports `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`, and `DB_PASSWORD`
+  - keeps process-level Docker environment variables ahead of `.env`
+- Verified `php/config.php` and `php/admin/layout.php` pass PHP syntax checks after Docker/config changes.
+- Confirmed the current host PHP runtime only has SQLite PDO available, which explains the local non-Docker MySQL connection failure.
+- Checked for Docker on this Windows shell:
+  - `docker` is not on PATH
+  - `where docker` finds nothing
+  - no Docker Desktop install was found under the usual Program Files or Start Menu paths
+  - `winget list --name Docker` did not find an installed Docker package

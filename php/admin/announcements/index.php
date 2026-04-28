@@ -6,16 +6,13 @@ require_once __DIR__ . '/../layout.php';
 admin_require_login();
 
 $pdo = db();
+$message = trim((string) ($_GET['message'] ?? ''));
+$error = trim((string) ($_GET['error'] ?? ''));
 
-// Handle status messages
-$message = $_GET['message'] ?? '';
-$error = $_GET['error'] ?? '';
-
-// Fetch all announcements
 $stmt = $pdo->query("
     SELECT id, category, title, body, start_date, end_date, is_published, sort_order, created_at, updated_at
     FROM announcements
-    ORDER BY is_published DESC, sort_order ASC, created_at DESC
+    ORDER BY is_published DESC, sort_order ASC, created_at DESC, id DESC
 ");
 $announcements = $stmt->fetchAll();
 
@@ -23,20 +20,21 @@ admin_page_start('Announcements', 'announcements');
 ?>
 
 <?php if ($message): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
+    <div class="flash flash-success"><?= htmlspecialchars($message) ?></div>
 <?php endif; ?>
 
 <?php if ($error): ?>
-    <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+    <div class="flash flash-error"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
 
-<section class="card">
-    <div class="card-header">
-        <h2>Manage Announcements</h2>
+<section class="card announcement-card-shell">
+    <div class="card-header announcement-list-header">
+        <div class="announcement-page-head">
+            <h3>Manage Announcements</h3>
+            <p class="announcement-page-copy">Use the arrows to move announcements up or down. New announcements publish straight to the site, and edits save without any sort-order box.</p>
+        </div>
         <a href="new.php" class="btn btn-primary">+ New Announcement</a>
     </div>
-    
-    <p class="muted">Announcements can be published to the main homepage or youth page. Set date ranges to automatically show/hide them.</p>
 
     <?php if (empty($announcements)): ?>
         <div class="empty-state">
@@ -44,63 +42,89 @@ admin_page_start('Announcements', 'announcements');
             <a href="new.php" class="btn btn-primary">+ Create Announcement</a>
         </div>
     <?php else: ?>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Category</th>
-                    <th>Dates</th>
-                    <th>Status</th>
-                    <th>Sort</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($announcements as $ann): ?>
+        <div class="table-wrapper">
+            <table class="table announcement-table">
+                <thead>
                     <tr>
-                        <td>
-                            <strong><?= htmlspecialchars($ann['title']) ?></strong>
-                            <br>
-                            <small class="muted"><?= htmlspecialchars(substr($ann['body'], 0, 80)) ?><?= strlen($ann['body']) > 80 ? '...' : '' ?></small>
-                        </td>
-                        <td>
-                            <span class="badge <?= $ann['category'] === 'youth' ? 'badge-info' : '' ?>">
-                                <?= htmlspecialchars(ucfirst($ann['category'])) ?>
-                            </span>
-                        </td>
-                        <td>
-                            <small>
-                                <?php if ($ann['start_date']): ?>
-                                    From: <?= htmlspecialchars($ann['start_date']) ?><br>
-                                <?php endif; ?>
-                                <?php if ($ann['end_date']): ?>
-                                    Until: <?= htmlspecialchars($ann['end_date']) ?>
-                                <?php endif; ?>
-                                <?php if (!$ann['start_date'] && !$ann['end_date']): ?>
-                                    Always visible
-                                <?php endif; ?>
-                            </small>
-                        </td>
-                        <td>
-                            <?php if ($ann['is_published']): ?>
-                                <span class="badge badge-success">Published</span>
-                            <?php else: ?>
-                                <span class="badge badge-muted">Draft</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?= (int)$ann['sort_order'] ?></td>
-                        <td class="actions">
-                            <a href="edit.php?id=<?= (int)$ann['id'] ?>" class="btn btn-sm">Edit</a>
-                            <form method="POST" action="delete.php" style="display:inline;" onsubmit="return confirm('Delete this announcement?');">
-                                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                <input type="hidden" name="id" value="<?= (int)$ann['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <th>Announcement</th>
+                        <th>Placement</th>
+                        <th>Schedule</th>
+                        <th>Status</th>
+                        <th>Move</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($announcements as $index => $ann): ?>
+                        <?php
+                        $previous = $announcements[$index - 1] ?? null;
+                        $next = $announcements[$index + 1] ?? null;
+                        $canMoveUp = $previous && (int) $previous['is_published'] === (int) $ann['is_published'];
+                        $canMoveDown = $next && (int) $next['is_published'] === (int) $ann['is_published'];
+                        $bodyPreview = trim((string) $ann['body']);
+                        if (function_exists('mb_substr')) {
+                            $previewText = mb_substr($bodyPreview, 0, 96);
+                            $hasMore = mb_strlen($bodyPreview) > 96;
+                        } else {
+                            $previewText = substr($bodyPreview, 0, 96);
+                            $hasMore = strlen($bodyPreview) > 96;
+                        }
+                        ?>
+                        <tr>
+                            <td class="announcement-title-cell">
+                                <strong><?= htmlspecialchars($ann['title']) ?></strong>
+                                <small class="muted announcement-preview"><?= htmlspecialchars($previewText) ?><?= $hasMore ? '…' : '' ?></small>
+                            </td>
+                            <td>
+                                <span class="announcement-meta-label"><?= htmlspecialchars(ucfirst($ann['category'])) ?></span>
+                            </td>
+                            <td>
+                                <small class="announcement-meta-block">
+                                    <?php if ($ann['start_date']): ?>
+                                        <span>Starts <?= htmlspecialchars((string) $ann['start_date']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($ann['end_date']): ?>
+                                        <span>Ends <?= htmlspecialchars((string) $ann['end_date']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!$ann['start_date'] && !$ann['end_date']): ?>
+                                        <span>Always visible</span>
+                                    <?php endif; ?>
+                                </small>
+                            </td>
+                            <td>
+                                <span class="announcement-status <?= $ann['is_published'] ? 'is-live' : 'is-muted' ?>">
+                                    <?= $ann['is_published'] ? 'Published' : 'Draft' ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="announcement-move-cell">
+                                    <form method="POST" action="reorder.php" class="move-form">
+                                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                        <input type="hidden" name="id" value="<?= (int) $ann['id'] ?>">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="move-btn" aria-label="Move announcement up" <?= $canMoveUp ? '' : 'disabled' ?>>↑</button>
+                                    </form>
+                                    <form method="POST" action="reorder.php" class="move-form">
+                                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                        <input type="hidden" name="id" value="<?= (int) $ann['id'] ?>">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="move-btn" aria-label="Move announcement down" <?= $canMoveDown ? '' : 'disabled' ?>>↓</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="actions">
+                                <a href="edit.php?id=<?= (int) $ann['id'] ?>" class="btn btn-sm">Edit</a>
+                                <form method="POST" action="delete.php" onsubmit="return confirm('Delete this announcement?');">
+                                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                    <input type="hidden" name="id" value="<?= (int) $ann['id'] ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </section>
 

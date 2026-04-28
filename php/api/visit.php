@@ -12,7 +12,8 @@ $email = trim((string)($input['email'] ?? ''));
 $phone = trim((string)($input['phone'] ?? ''));
 $visitDate = trim((string)($input['date'] ?? $input['visit_date'] ?? ''));
 $partySize = trim((string)($input['party'] ?? $input['party_size'] ?? ''));
-$notes = trim((string)($input['notes'] ?? ''));
+$preferredService = trim((string)($input['preferred_service'] ?? $input['service'] ?? ''));
+$notes = trim((string)($input['notes'] ?? $input['message'] ?? ''));
 
 if ($name === '' || $email === '') {
     fail('Name and email are required to plan your visit.', 422);
@@ -33,20 +34,48 @@ if ($visitDate !== '') {
 
 $pdo = db();
 
-$sql = 'INSERT INTO visit_submissions (name, email, phone, visit_date, party_size, notes)
-        VALUES (:name, :email, :phone, :visit_date, :party_size, :notes)';
+$hasPreferredService = db_column_exists($pdo, 'visit_submissions', 'preferred_service');
+$hasMessage = db_column_exists($pdo, 'visit_submissions', 'message');
+$hasSubmittedAt = db_column_exists($pdo, 'visit_submissions', 'submitted_at');
+
+$columns = ['name', 'email', 'phone', 'visit_date', 'party_size', 'notes'];
+$values = [':name', ':email', ':phone', ':visit_date', ':party_size', ':notes'];
+$params = [
+    ':name' => $name,
+    ':email' => $email,
+    ':phone' => $phone !== '' ? $phone : null,
+    ':visit_date' => $dateValue,
+    ':party_size' => $partySize !== '' ? $partySize : null,
+    ':notes' => $notes !== '' ? $notes : null,
+];
+
+if ($hasPreferredService) {
+    $columns[] = 'preferred_service';
+    $values[] = ':preferred_service';
+    $params[':preferred_service'] = $preferredService !== '' ? $preferredService : null;
+}
+
+if ($hasMessage) {
+    $columns[] = 'message';
+    $values[] = ':message';
+    $params[':message'] = $notes !== '' ? $notes : null;
+}
+
+if ($hasSubmittedAt) {
+    $columns[] = 'submitted_at';
+    $values[] = 'NOW()';
+}
+
+$sql = sprintf(
+    'INSERT INTO visit_submissions (%s) VALUES (%s)',
+    implode(', ', $columns),
+    implode(', ', $values)
+);
 
 $stmt = $pdo->prepare($sql);
 
 try {
-    $stmt->execute([
-        ':name' => $name,
-        ':email' => $email,
-        ':phone' => $phone !== '' ? $phone : null,
-        ':visit_date' => $dateValue,
-        ':party_size' => $partySize !== '' ? $partySize : null,
-        ':notes' => $notes !== '' ? $notes : null,
-    ]);
+    $stmt->execute($params);
 } catch (PDOException $e) {
     error_log('Failed to save visit submission: ' . $e->getMessage());
     fail('We could not save your visit request right now. Please try again shortly.', 500);

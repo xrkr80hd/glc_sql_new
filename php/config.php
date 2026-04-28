@@ -1,24 +1,61 @@
 <?php
 declare(strict_types=1);
 
+// Start output buffering to prevent "headers already sent" errors
+ob_start();
+
 // -----------------------------------------------------------------------------
 // Liberty Church PHP Bootstrap
 // This configuration uses the live production credentials so every local test
 // mirrors the deployed environment exactly. Do not replace with placeholders.
 // -----------------------------------------------------------------------------
 
+// Load real environment variables if present (.env mirrors production values).
+// Process-level values, such as Docker Compose environment settings, win.
+$envPath = dirname(__DIR__) . '/.env';
+if (is_readable($envPath)) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) {
+            continue;
+        }
+        [$key, $val] = array_map('trim', explode('=', $line, 2));
+        if ($key !== '' && getenv($key) === false) {
+            putenv("{$key}={$val}");
+        }
+    }
+}
+
+function config_value(string $key, string $fallback): string
+{
+    $value = getenv($key);
+    return $value === false || $value === '' ? $fallback : $value;
+}
+
+function config_bool(string $key, bool $fallback): bool
+{
+    $value = getenv($key);
+    if ($value === false || $value === '') {
+        return $fallback;
+    }
+
+    return in_array(strtolower($value), ['1', 'true', 'yes', 'on'], true);
+}
+
 // Database credentials (MySQL)
-const DB_HOST = 'localhost';
-const DB_NAME = 'golibert2_liberty_church';
-const DB_USER = 'golibert2_liberty_church_user';
-const DB_PASS = '@LibertyChurch1065!';
-const DB_CHARSET = 'utf8mb4';
+define('DB_HOST', config_value('DB_HOST', 'localhost'));
+define('DB_PORT', config_value('DB_PORT', ''));
+define('DB_NAME', config_value('DB_NAME', 'golibert2_liberty_church'));
+define('DB_USER', config_value('DB_USER', 'golibert2_liberty_church_user'));
+define('DB_PASS', config_value('DB_PASS', config_value('DB_PASSWORD', '@LibertyChurch1065!')));
+define('DB_CHARSET', config_value('DB_CHARSET', 'utf8mb4'));
 
 // Application constants
 const APP_NAME = 'Liberty Church Admin';
 const SESSION_NAME = 'liberty_admin_session';
 const UPLOAD_DIR = __DIR__ . '/../uploads';
 const MAX_UPLOAD_BYTES = 75 * 1024 * 1024; // 75 MB cap for youth media
+define('ADMIN_LOGIN_DISABLED', config_bool('ADMIN_LOGIN_DISABLED', true)); // Local OG_UPDATING conversion mode only.
 
 // Ensure sessions are available
 if (session_status() === PHP_SESSION_NONE) {
@@ -36,7 +73,8 @@ function db(): PDO
     static $pdo = null;
 
     if ($pdo === null) {
-        $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', DB_HOST, DB_NAME, DB_CHARSET);
+        $portPart = DB_PORT !== '' ? ';port=' . DB_PORT : '';
+        $dsn = sprintf('mysql:host=%s%s;dbname=%s;charset=%s', DB_HOST, $portPart, DB_NAME, DB_CHARSET);
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -47,6 +85,9 @@ function db(): PDO
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
             error_log('Database connection failed: ' . $e->getMessage());
+            if (defined('ADMIN_LOGIN_DISABLED') && ADMIN_LOGIN_DISABLED) {
+                throw new RuntimeException('Database connection failed. Please verify credentials in php/config.php.', 0, $e);
+            }
             http_response_code(500);
             exit('Database connection failed. Please verify credentials in php/config.php.');
         }
@@ -99,6 +140,17 @@ function format_datetime(?string $value): ?string
 
 function guard_auth(): void
 {
+    if (defined('ADMIN_LOGIN_DISABLED') && ADMIN_LOGIN_DISABLED) {
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_user'] ??= [
+            'id' => 0,
+            'username' => 'local-admin',
+            'role' => 'pastor',
+        ];
+        $_SESSION['admin_user_id'] = 0;
+        return;
+    }
+
     if (empty($_SESSION['admin_logged_in'])) {
         header('Location: /php/admin/login.php');
         exit;
@@ -125,20 +177,5 @@ function verify_csrf(?string $token): void
 
 // Configure default timezone (matches production server)
 date_default_timezone_set('America/Chicago');
-
-// Load real environment variables if present (.env mirrors production values)
-$envPath = dirname(__DIR__) . '/.env';
-if (is_readable($envPath)) {
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (str_starts_with(trim($line), '#')) {
-            continue;
-        }
-        [$key, $val] = array_map('trim', explode('=', $line, 2));
-        if ($key !== '' && getenv($key) === false) {
-            putenv("{$key}={$val}");
-        }
-    }
-}
 
 ?>

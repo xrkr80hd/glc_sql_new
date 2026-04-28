@@ -263,7 +263,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 	setHref('youtubeLink', links.youtube); setHref('facebookLink', links.facebook); setHref('instagramLink', links.instagram);
 
 	const addr = church.address || '100 McKeithen Dr, Alexandria, LA 71303';
-	setText('address', addr); setText('footerAddress', addr);
+	const mailingAddr = church.mailingAddress || 'PO BOX 11766 Alexandria, LA 71315';
+	setText('address', addr); setText('footerAddress', addr); setText('footerMailingAddress', mailingAddr);
 	renderList(document.getElementById('serviceTimes'), serviceTimes.length?serviceTimes:[
 		'Sundays @ 9:20 AM – Youth Devotion',
 		'Sundays @ 10:00 AM – Worship Service'

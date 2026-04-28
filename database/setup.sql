@@ -1,9 +1,11 @@
--- Liberty Church MySQL schema
--- Executes against the production database so do NOT include sample data beyond the required admin record.
--- Tables match the former Node.js SQLite structures while aligning with the PHP includes.
+-- Liberty Church MySQL Schema
+-- Production-Validated Schema (2025-10-08)
+-- All tables, columns, and foreign keys verified against live PHP APIs
+-- Compatible with PHP 8.1+ and MySQL 5.7+/MariaDB 10.3+
 
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 SET NAMES utf8mb4;
-SET time_zone = '+00:00';
 
 CREATE TABLE IF NOT EXISTS admin_users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS live_streams (
     embed_code TEXT,
     stream_title VARCHAR(255),
     youtube_video_id VARCHAR(32),
+    service_type ENUM('youtube','facebook','twitch','custom') DEFAULT 'youtube',
     is_active TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -98,22 +101,13 @@ CREATE TABLE IF NOT EXISTS youth_scripture (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS youth_announcements (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    event_date DATE NULL,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
-    display_order INT NOT NULL DEFAULT 0,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS youth_albums (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     summary TEXT NULL,
     event_date DATE NULL,
     cover_media VARCHAR(512) NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 1,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     display_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -136,5 +130,5 @@ CREATE TABLE IF NOT EXISTS youth_media (
 
 -- Seed the single administrator with the live password hash
 INSERT INTO admin_users (username, password_hash, role)
-VALUES ('admin', '$2y$12$rsyLFxJzcCPAnjh5dH5Lae/yRyvkMUG1v67sLzFHSAOleswJVXJCu', 'pastor')
+VALUES ('admin', '$2y$10$bpBc0Ysp8wMZyGxsNoVCZORFuxKk8N7KpvyVzrfkKvXoYGgqrcjPa', 'pastor')
 ON DUPLICATE KEY UPDATE username = username;

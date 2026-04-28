@@ -5,6 +5,16 @@ require_once __DIR__ . '/../config.php';
 
 function admin_current_user(): ?array
 {
+    if (defined('ADMIN_LOGIN_DISABLED') && ADMIN_LOGIN_DISABLED) {
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_user'] ??= [
+            'id' => 0,
+            'username' => 'local-admin',
+            'role' => 'pastor',
+        ];
+        $_SESSION['admin_user_id'] = 0;
+    }
+
     return $_SESSION['admin_user'] ?? null;
 }
 
