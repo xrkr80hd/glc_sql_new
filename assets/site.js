@@ -125,17 +125,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 		animateOnScroll.observe(section);
 	});
 
-	// Performance: Preload critical resources
-	const preloadVideo = () => {
-		const heroVideo = document.getElementById('heroVideo');
-		if (heroVideo && !heroVideo.src) {
-			// Preload with connection hint
-			const link = document.createElement('link');
-			link.rel = 'preload';
-			link.as = 'video';
-			link.type = 'video/mp4';
-			document.head.appendChild(link);
-		}
+	// Performance: Preload the selected homepage hero video
+	const preloadVideo = (src) => {
+		if (!src) return;
+		const link = document.createElement('link');
+		link.rel = 'preload';
+		link.as = 'video';
+		link.type = 'video/mp4';
+		link.href = src;
+		document.head.appendChild(link);
 	};
 
 	// Performance: Image lazy loading enhancement
@@ -204,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 		});
 	});
 
-	preloadVideo();
 	// Mobile nav: supports either #primaryNav (.nav-links) or legacy #mainNav (with <ul>)
 	const toggle=document.querySelector('.nav-toggle');
 	const primary=document.getElementById('primaryNav');
@@ -245,6 +242,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 			'./assets/hero_vids/worship_hero_1.mp4'
 		];
 		const pick = vids[Math.floor(Math.random()*vids.length)];
+		preloadVideo(pick);
 		v.src = pick;
 		// When metadata loads, make it visible smoothly
 		v.addEventListener('loadeddata', ()=>{
@@ -568,11 +566,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 		if(openBtn) openBtn.addEventListener('click', open);
 		if(closeBtn) closeBtn.addEventListener('click', close);
 		if(backdrop) backdrop.addEventListener('click', close);
-		// Auto-open only once per user (localStorage flag)
-		try{
-			const seen = localStorage.getItem('welcomeSeen');
-			if(!seen){ setTimeout(open, 800); }
-		}catch(e){ /* ignore storage issues */ }
 	})();
 });
 
